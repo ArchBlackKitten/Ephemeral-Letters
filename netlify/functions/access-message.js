@@ -1,4 +1,3 @@
-const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
     const { messageId, maxCopies, expiryHours } = JSON.parse(event.body);
