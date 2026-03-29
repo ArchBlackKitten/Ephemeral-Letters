@@ -6,10 +6,31 @@
     <title>Ephemeral-Letters</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        body { background: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; }
-        .gradient-text { background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hidden { display: none; }
+    /* Glass effect with a subtle violet tint */
+    .glass { 
+        background: rgba(139, 92, 246, 0.03); 
+        backdrop-filter: blur(12px); 
+        border: 1px solid rgba(167, 139, 250, 0.15); 
+    }
+
+    /* Deep Obsidian Violet Background */
+    body { 
+        background: #0a0514; 
+        color: #f1f5f9; 
+        font-family: 'Inter', sans-serif; 
+        /* Optional: adds a very faint radial glow to the center */
+        background-image: radial-gradient(circle at center, #1a0b2e 0%, #0a0514 100%);
+    }
+
+    /* Proton Violet Gradient: Electric Purple to Soft Violet */
+    .gradient-text { 
+        background: linear-gradient(45deg, #a855f7, #6366f1); 
+        -webkit-background-clip: text; 
+        -webkit-text-fill-color: transparent; 
+        text-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
+    }
+
+    .hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
