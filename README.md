@@ -1,9 +1,11 @@
-# NoVisibleText
+# Ephemera | Zero-Knowledge, Single-Use Correspondence
+**Securely share messages that exist only until they are read.**
+
 A visual hiding tool: Just share the link and your recipient has a one-time-use message in their clipboard.
 
 #
-## 🛡️ How NoVisibleText Works
-NoVisibleText uses a Hybrid-Security model. The secret message never touches a database, but the "one-time-use" rule is strictly enforced by a global counter.
+## 🛡️ How Ephemera Works
+Ephemera uses a Hybrid-Security model. The secret message never touches a database, but the "one-time-use" rule is strictly enforced by a global counter.
 
 ### 📤 Phase 1: Creation (Person A)
 **✍️ Compose:** Person A writes a message and sets a Max Copy limit (e.g., 3 uses).
