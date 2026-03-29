@@ -76,13 +76,16 @@
     </div>
 
     <script>
-        let encryptedPayload = "";
-
-        // Function for Change 3: Reset to homepage
+        // Place this at the top so it's globally available
         function resetApp() {
-            // This clears the #hash from the URL and reloads the page to the selection screen
+            // Clear the URL hash (the secret data)
+            window.history.replaceState(null, null, window.location.pathname);
+            // Force reload to the main selection screen
             window.location.href = window.location.origin + window.location.pathname;
         }
+
+        
+        let encryptedPayload = "";
 
         // CHANGE 2: Handle manual input
         function handleManualLink() {
@@ -134,8 +137,7 @@
             document.getElementById(id).classList.remove('hidden');
         }
 
-        function resetApp() { window.location.href = window.location.origin + window.location.pathname; }
-
+       
         async function generateLink() {
             const msg = document.getElementById('create-msg').value;
             const key = document.getElementById('create-key').value;
