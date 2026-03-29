@@ -43,41 +43,41 @@
         </div>
 
         <div id="view-selection" class="space-y-4">
-            <button onclick="showCreate()" class="w-full p-4 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold transition">Create a Secret Letter</button>
-            <button onclick="showRead()" class="w-full p-4 bg-slate-800 hover:bg-slate-700 rounded-xl font-semibold transition border border-slate-700">Read a Received Letter</button>
+            <button onclick="showCreate()" class="w-full p-4 g-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-500/20 rounded-xl font-semibold transition">Create a Secret Letter</button>
+            <button onclick="showRead()" class="w-full p-4 bg-slate-800 hover:bg-slate-700 rounded-xl font-semibold transition border border-violet-500/30">Read a Received Letter</button>
             
             <!-- CHANGE 2: Box to paste link -->
-            <div class="pt-4 border-t border-slate-700">
+            <div class="pt-4 border-t border-violet-500/30">
                 <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block text-center">Received a link?</label>
                 <div class="flex gap-2">
-                    <input type="text" id="manual-url-input" placeholder="Paste link here..." class="flex-1 p-2 bg-slate-900 border border-slate-700 rounded-lg text-xs outline-none focus:border-sky-500">
+                    <input type="text" id="manual-url-input" placeholder="Paste link here..." class="flex-1 p-2 bg-slate-950 border border-violet-500/30 rounded-lg text-xs outline-none focus:border-sky-500">
                     <button onclick="handleManualLink()" class="px-4 py-2 bg-slate-700 rounded-lg text-xs hover:bg-slate-600 transition">Open</button>
                 </div>
             </div>
         </div>
 
         <div id="view-create" class="hidden space-y-4">
-            <textarea id="create-msg" placeholder="Type your secret message here..." class="w-full h-32 p-4 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-sm"></textarea>
+            <textarea id="create-msg" placeholder="Type your secret message here..." class="w-full h-32 p-4 bg-slate-950 border border-violet-500/30 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-sm"></textarea>
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Max Uses</label>
-                    <input type="number" id="create-max" value="1" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1 text-sm">
+                    <input type="number" id="create-max" value="1" min="1" class="w-full p-3 bg-slate-950 border border-violet-500/30 rounded-xl mt-1 text-sm">
                 </div>
                 <div>
                     <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Expires In (Hours)</label>
-                    <input type="number" id="create-expiry" value="24" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1 text-sm">
+                    <input type="number" id="create-expiry" value="24" min="1" class="w-full p-3 bg-slate-950 border border-violet-500/30 rounded-xl mt-1 text-sm">
                 </div>
                 <div class="col-span-2">
                     <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Passphrase (Opt)</label>
-                    <input type="password" id="create-key" placeholder="None" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1 text-sm">
+                    <input type="password" id="create-key" placeholder="None" class="w-full p-3 bg-slate-950 border border-violet-500/30 rounded-xl mt-1 text-sm">
                 </div>
             </div>
-            <button onclick="generateLink()" class="w-full p-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold transition">Generate Link</button>
+            <button onclick="generateLink()" class="w-full p-4 bg-fuchsia-700 hover:bg-fuchsia-600 shadow-fuchsia-500/20 rounded-xl font-semibold transition">Generate Link</button>
             <button onclick="switchView('view-selection')" class="w-full text-sm text-slate-500 hover:text-white transition">← Back</button>
         </div>
 
         <div id="view-share" class="hidden space-y-4 text-center">
-            <div class="p-4 bg-slate-900 rounded-xl border border-dashed border-slate-600 break-all text-[10px] text-sky-400 font-mono" id="final-link"></div>
+            <div class="p-4 bg-slate-950 rounded-xl border border-dashed border-slate-600 break-all text-[10px] text-sky-400 font-mono" id="final-link"></div>
             <button onclick="copyLink()" id="copy-link-btn" class="w-full p-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold transition">Copy Link to Share</button>
             <p class="text-[10px] text-slate-500 italic">This link contains the encrypted message. It is never stored on a server.</p>
         </div>
@@ -85,8 +85,8 @@
         <div id="view-read" class="hidden space-y-4">
             <div id="unlock-area" class="space-y-4">
                 <p class="text-center text-slate-300">This letter is locked.</p>
-                <input type="password" id="read-key" placeholder="Enter secret key" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl outline-none focus:border-sky-500">
-                <button onclick="decryptMessage()" class="w-full p-4 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold transition">Unlock with Key</button>
+                <input type="password" id="read-key" placeholder="Enter secret key" class="w-full p-3 bg-slate-950 border border-violet-500/30 rounded-xl outline-none focus:border-sky-500">
+                <button onclick="decryptMessage()" class="w-full p-4 g-violet-600 hover:bg-violet-500 shadow-lg shadow-violet-500/20 rounded-xl font-semibold transition">Unlock with Key</button>
             </div>
             
             <div id="receive-area" class="hidden text-center space-y-6">
