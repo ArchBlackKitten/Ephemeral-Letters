@@ -18,7 +18,7 @@
         <div class="text-center mb-8">
             <!-- CHANGE 3: Title is now a link to reset -->
             <h1 onclick="resetApp()" 
-                class="text-3xl font-bold gradient-text mb-2 cursor-pointer hover:opacity-80 transitionactive:scale-95">Ephemeral-Letters</h1>
+                class="text-3xl font-bold gradient-text mb-2 cursor-pointer hover:opacity-80 transitionactive active:scale-95">Ephemeral-Letters</h1>
             <p class="text-slate-400 text-sm">Secure, invisible, one-time messages.</p>
         </div>
 
@@ -77,6 +77,12 @@
 
     <script>
         let encryptedPayload = "";
+
+        // Function for Change 3: Reset to homepage
+        function resetApp() {
+            // This clears the #hash from the URL and reloads the page to the selection screen
+            window.location.href = window.location.origin + window.location.pathname;
+        }
 
         // CHANGE 2: Handle manual input
         function handleManualLink() {
@@ -172,7 +178,10 @@
                 // CHANGE 1: Talking to the Netlify Function for counting
                 const response = await fetch('/.netlify/functions/access-message', {
                     method: 'POST',
-                    body: JSON.stringify({ messageId: pkg.id, maxCopies: pkg.c })
+                    body: JSON.stringify({ 
+                        messageId: pkg.id, 
+                        maxCopies: pkg.c 
+                    })
                 });
 
                 if (response.status === 403) {
