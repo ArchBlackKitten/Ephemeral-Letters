@@ -43,6 +43,10 @@
                     <input type="number" id="create-max" value="1" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1 text-sm">
                 </div>
                 <div>
+                    <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Expires In (Hours)</label>
+                    <input type="number" id="create-expiry" value="24" min="1" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1 text-sm">
+                </div>
+                <div class="col-span-2">
                     <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Passphrase (Opt)</label>
                     <input type="password" id="create-key" placeholder="None" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1 text-sm">
                 </div>
@@ -142,11 +146,16 @@
             const msg = document.getElementById('create-msg').value;
             const key = document.getElementById('create-key').value;
             const max = document.getElementById('create-max').value || 1;
+            let expiry = parseInt(document.getElementById('create-expiry').value) || 24;
+
+            // HARD CAP: Force 24 hours if the user enters more
+            if (expiry > 24) expiry = 24;
+            if (expiry < 1) expiry = 1;
             
             if(!msg) return alert("Write something first!");
 
             // Create a package object
-            const pkg = { m: msg, c: parseInt(max), id: Math.random().toString(36).substring(2, 11) };
+            const pkg = { m: msg, c: parseInt(max), e: expiry, id: Math.random().toString(36).substring(2, 11) };
             const str = JSON.stringify(pkg);
             const encoded = btoa(unescape(encodeURIComponent(str)));
 
@@ -182,7 +191,8 @@
                     method: 'POST',
                     body: JSON.stringify({ 
                         messageId: pkg.id, 
-                        maxCopies: pkg.c 
+                        maxCopies: pkg.c, 
+                        expiryHours: pkg.e
                     })
                 });
 
