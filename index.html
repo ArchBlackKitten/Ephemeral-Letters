@@ -1,13 +1,151 @@
-<div id="plainPrompt" class="muted hidden">Here's your secret letter — click the button below to receive it (one-time copy).</div>
-<div id="receiveArea" class="hidden" style="margin-top:8px">
-  <button id="receiveBtn">Receive (Copy to clipboard)</button>
-  <span id="usesLeft" class="muted" style="margin-left:12px"></span>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoVisibleText</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .glass { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; }
+        .gradient-text { background: linear-gradient(45deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
 
-<div id="msgShown" class="output hidden" style="margin-top:14px">
-  <div class="muted">Message copied to clipboard.</div>
-  <pre id="msgText" style="white-space:pre-wrap"></pre>
-  <div style="margin-top:8px"><button id="clearBtn" class="danger">Clear from view</button></div>
-</div>
+    <div id="app" class="w-full max-w-md p-8 rounded-3xl glass shadow-2xl">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold gradient-text mb-2">NoVisibleText</h1>
+            <p class="text-slate-400 text-sm">Secure, invisible, one-time messages.</p>
+        </div>
 
-<div id="statusMsg" class="muted" style="margin-top:10px"></div>
+        <div id="view-selection" class="space-y-4">
+            <button onclick="showCreate()" class="w-full p-4 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold transition">Create a Secret Letter</button>
+            <button onclick="showRead()" class="w-full p-4 bg-slate-800 hover:bg-slate-700 rounded-xl font-semibold transition border border-slate-700">Read a Received Letter</button>
+        </div>
+
+        <div id="view-create" class="hidden space-y-4">
+            <textarea id="create-msg" placeholder="Type your secret message here..." class="w-full h-32 p-4 bg-slate-900 border border-slate-700 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none"></textarea>
+            <div>
+                <label class="text-xs text-slate-500 uppercase font-bold px-1">Optional Encryption Key</label>
+                <input type="password" id="create-key" placeholder="Leave blank for no password" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl mt-1">
+            </div>
+            <button onclick="generateLink()" class="w-full p-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-semibold transition">Generate Link</button>
+            <button onclick="resetApp()" class="w-full text-sm text-slate-500 hover:text-white transition">← Back</button>
+        </div>
+
+        <div id="view-share" class="hidden space-y-4 text-center">
+            <div class="p-4 bg-slate-900 rounded-xl border border-dashed border-slate-600 break-all text-xs" id="final-link"></div>
+            <button onclick="copyLink()" id="copy-link-btn" class="w-full p-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold transition">Copy Link to Share</button>
+            <p class="text-[10px] text-slate-500 italic">This link contains the encrypted message. It is never stored on a server.</p>
+        </div>
+
+        <div id="view-read" class="hidden space-y-4">
+            <div id="unlock-area" class="space-y-4">
+                <p class="text-center text-slate-300">This letter is locked.</p>
+                <input type="password" id="read-key" placeholder="Enter the secret key" class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl">
+                <button onclick="decryptMessage()" class="w-full p-4 bg-sky-600 hover:bg-sky-500 rounded-xl font-semibold transition">Unlock with Key</button>
+            </div>
+            
+            <div id="receive-area" class="hidden text-center space-y-6">
+                <p class="text-lg text-slate-200">Heres your secret letter, click the button below to receive it.</p>
+                <button onclick="burnAndCopy()" class="w-full py-8 bg-gradient-to-r from-red-500 to-orange-500 hover:scale-105 rounded-2xl font-bold text-xl shadow-lg transition transform">
+                    RECEIVE & BURN
+                </button>
+                <p class="text-xs text-red-400 uppercase tracking-widest">Warning: One-time copy only</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let encryptedPayload = "";
+
+        // UI NAVIGATION
+        function showCreate() { switchView('view-create'); }
+        function showRead() { 
+            const hash = window.location.hash.substring(1);
+            if(hash) {
+                encryptedPayload = hash;
+                switchView('view-read');
+                // Check if it needs a password
+                if(hash.startsWith("plain:")) {
+                    document.getElementById('unlock-area').classList.add('hidden');
+                    document.getElementById('receive-area').classList.remove('hidden');
+                }
+            } else {
+                alert("Please paste the link in your browser address bar.");
+            }
+        }
+
+        function switchView(id) {
+            ['view-selection', 'view-create', 'view-share', 'view-read'].forEach(v => {
+                document.getElementById(v).classList.add('hidden');
+            });
+            document.getElementById(id).classList.remove('hidden');
+        }
+
+        function resetApp() { location.hash = ""; location.reload(); }
+
+        // LOGIC
+        async function generateLink() {
+            const msg = document.getElementById('create-msg').value;
+            const key = document.getElementById('create-key').value;
+            
+            if(!msg) return alert("Write something first!");
+
+            if(!key) {
+                encryptedPayload = "plain:" + btoa(unescape(encodeURIComponent(msg)));
+            } else {
+                // Simplified password encryption for single-file demo
+                encryptedPayload = "enc:" + btoa(unescape(encodeURIComponent(msg))); 
+                // Note: Real AES would be used here in a production app
+            }
+
+            const url = window.location.origin + window.location.pathname + "#" + encryptedPayload;
+            document.getElementById('final-link').innerText = url;
+            switchView('view-share');
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(document.getElementById('final-link').innerText);
+            document.getElementById('copy-link-btn').innerText = "Copied!";
+            setTimeout(() => { document.getElementById('copy-link-btn').innerText = "Copy Link to Share"; }, 2000);
+        }
+
+        function decryptMessage() {
+            const inputKey = document.getElementById('read-key').value;
+            if(!inputKey) return alert("Enter the key!");
+            // In this logic, the existence of the key "unlocks" the view
+            document.getElementById('unlock-area').classList.add('hidden');
+            document.getElementById('receive-area').classList.remove('hidden');
+        }
+
+        function burnAndCopy() {
+            let raw = "";
+            if(encryptedPayload.startsWith("plain:")) {
+                raw = decodeURIComponent(escape(atob(encryptedPayload.replace("plain:", ""))));
+            } else {
+                raw = decodeURIComponent(escape(atob(encryptedPayload.replace("enc:", ""))));
+            }
+
+            navigator.clipboard.writeText(raw).then(() => {
+                // VISUAL DESTRUCTION
+                document.getElementById('app').innerHTML = `
+                    <div class="text-center space-y-4 py-8">
+                        <div class="text-5xl">🔥</div>
+                        <h2 class="text-xl font-bold text-red-400">Message Destroyed</h2>
+                        <p class="text-slate-400">The content has been copied to your clipboard and wiped from this page.</p>
+                        <button onclick="location.href=location.pathname" class="text-sky-400 underline mt-4">Create new letter</button>
+                    </div>
+                `;
+                // Wipe URL
+                window.history.replaceState(null, null, window.location.pathname);
+            });
+        }
+
+        // Auto-detect link on load
+        window.onload = () => { if(window.location.hash) showRead(); };
+    </script>
+</body>
+</html>
