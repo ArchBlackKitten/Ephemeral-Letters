@@ -17,7 +17,8 @@
     <div id="app" class="w-full max-w-md p-8 rounded-3xl glass shadow-2xl">
         <div class="text-center mb-8">
             <!-- CHANGE 3: Title is now a link to reset -->
-            <h1 onclick="resetApp()" class="text-3xl font-bold gradient-text mb-2 cursor-pointer hover:opacity-80 transition">Ephemeral-Letters</h1>
+            <h1 onclick="resetApp()" 
+                class="text-3xl font-bold gradient-text mb-2 cursor-pointer hover:opacity-80 transitionactive:scale-95">Ephemeral-Letters</h1>
             <p class="text-slate-400 text-sm">Secure, invisible, one-time messages.</p>
         </div>
 
@@ -79,13 +80,28 @@
 
         // CHANGE 2: Handle manual input
         function handleManualLink() {
-            const input = document.getElementById('manual-url-input').value;
-            if (input.includes('#')) {
-                const hash = input.split('#')[1];
-                window.location.hash = hash;
-                showRead();
-            } else {
-                alert("Invalid link format.");
+            const input = document.getElementById('manual-url-input').value.trim();
+            if (!input) return;
+
+            try {
+                // Find the part after the '#'
+                const url = new URL(input.startsWith('http') ? input : 'https://' + input);
+                const hash = url.hash.substring(1);
+        
+                if (hash) {
+                    window.location.hash = hash;
+                    showRead(); // This triggers the decryption view
+                } else {
+                    alert("This link doesn't contain a secret code.");
+                }
+            } catch (e) {
+                // Fallback for when they paste just the code, not the whole URL
+                if (input.includes(':')) {
+                    window.location.hash = input;
+                    showRead();
+                } else {
+                    alert("Invalid link or code.");
+                }
             }
         }
 
