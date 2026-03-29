@@ -1,18 +1,13 @@
-<!DOCTYPE html>
-<html>
-<body>
-  <input type="text" id="msg" placeholder="Enter secret">
-  <button onclick="generate()">Generate & Copy</button>
-  <div id="output" style="color: white; user-select: all;"></div>
+<div id="plainPrompt" class="muted hidden">Here's your secret letter — click the button below to receive it (one-time copy).</div>
+<div id="receiveArea" class="hidden" style="margin-top:8px">
+  <button id="receiveBtn">Receive (Copy to clipboard)</button>
+  <span id="usesLeft" class="muted" style="margin-left:12px"></span>
+</div>
 
-  <script>
-    function generate() {
-      const visible = "This looks empty.";
-      const secret = document.getElementById("msg").value;
-      const output = `${visible}<span style="color: white; font-size: 0;">${secret}</span>`;
-      document.getElementById("output").innerHTML = output;
-      navigator.clipboard.writeText(visible + secret);
-    }
-  </script>
-</body>
-</html>   
+<div id="msgShown" class="output hidden" style="margin-top:14px">
+  <div class="muted">Message copied to clipboard.</div>
+  <pre id="msgText" style="white-space:pre-wrap"></pre>
+  <div style="margin-top:8px"><button id="clearBtn" class="danger">Clear from view</button></div>
+</div>
+
+<div id="statusMsg" class="muted" style="margin-top:10px"></div>
