@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input type="text" id="msg" placeholder="Enter secret">
+  <button onclick="generate()">Generate & Copy</button>
+  <div id="output" style="color: white; user-select: all;"></div>
+
+  <script>
+    function generate() {
+      const visible = "This looks empty.";
+      const secret = document.getElementById("msg").value;
+      const output = `${visible}<span style="color: white; font-size: 0;">${secret}</span>`;
+      document.getElementById("output").innerHTML = output;
+      navigator.clipboard.writeText(visible + secret);
+    }
+  </script>
+</body>
+</html>   
