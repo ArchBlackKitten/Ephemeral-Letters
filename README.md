@@ -1,4 +1,4 @@
-# Ephemera | Zero-Knowledge, Single-Use Correspondence
+# Ephemeral Letters | Zero-Knowledge, Single-Use Correspondence
 **Securely share messages that exist only until they are read.**
 
 A visual hiding tool: Just share the link and your recipient has a one-time-use message in their clipboard.
