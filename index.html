@@ -44,6 +44,14 @@
         background-color: var(--proton-glow); 
         box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
     }
+    /* Prevents the white background/black text when pasting a link */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus {
+        -webkit-text-fill-color: #f1f5f9; /* Keeps your light text */
+        -webkit-box-shadow: 0 0 0px 1000px rgba(0,0,0,0.2) inset; /* Keeps it dark */
+        transition: background-color 5000s ease-in-out 0s;
+    }
     
     .hidden { display: none; }
 </style>
@@ -62,12 +70,20 @@
             <button onclick="showRead()" class="w-full p-4 btn-proton rounded-xl font-semibold transition">Read a Received Letter</button>
             
             <!-- CHANGE 2: Box to paste link -->
+            <!-- Received Link Section -->
             <div class="pt-4 border-t border-[var(--proton-glass)]">
                 <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block text-center">Received a link?</label>
                 <div class="flex gap-2">
-                    <input type="text" id="manual-url-input" placeholder="Paste link here..." class="flex-1 p-2 bg-black/20 border border-[var(--proton-glass)] rounded-lg text-xs outline-none focus:border-[var(--proton-glow)]">
-                    <button onclick="handleManualLink()" class="px-4 py-2 bg-white/5 border-[var(--proton-glass)] rounded-lg text-xs hover:bg-violet-600/40 transition">Open</button>
-                </div>
+                    <input type="text" 
+                       id="manual-url-input" 
+                      placeholder="Paste link here..." 
+                       /* Added text-slate-200 and forced the violet color for the link itself */
+                       class="flex-1 p-2 bg-black/20 border border-[var(--proton-glass)] rounded-lg text-xs outline-none focus:border-[var(--proton-glow)] text-slate-200 placeholder:text-slate-600">
+        
+                <button onclick="handleManualLink()" 
+                        class="px-4 py-2 bg-white/5 border border-[var(--proton-glass)] rounded-lg text-xs hover:bg-violet-600/40 text-[var(--proton-violet)] font-semibold transition">
+                    Open
+                </button>
             </div>
         </div>
 
@@ -92,9 +108,12 @@
         </div>
 
         <div id="view-share" class="hidden space-y-4 text-center">
-            <div class="p-4 bg-black/20 rounded-xl border border-dashed border-slate-600 break-all text-[10px] text-[var(--proton-glow)] font-mono" id="final-link"></div>
-            <button onclick="copyLink()" id="copy-link-btn" class="w-full p-4 bg-emerald-600 hover:bg-emerald-500 rounded-xl font-semibold transition">Copy Link to Share</button>
-            <p class="text-[10px] text-slate-500 italic">This link contains the encrypted message. It is never stored on a server.</p>
+              <!-- Changed text-sky-400 to text-[var(--proton-violet)] -->
+            <div class="p-4 bg-black/20 rounded-xl border border-dashed border-[var(--proton-glass)] break-all text-[10px] text-[var(--proton-violet)] font-mono" id="final-link"></div>
+    
+            <button onclick="copyLink()" id="copy-link-btn" class="w-full p-4 bg-emerald-600/80 hover:bg-emerald-500 rounded-xl font-semibold transition">
+                Copy Link to Share
+            </button>
         </div>
 
         <div id="view-read" class="hidden space-y-4">
