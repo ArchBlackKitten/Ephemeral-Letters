@@ -152,17 +152,24 @@
 
         function showCreate() { switchView('view-create'); }
 
-        function showRead() { 
-            const hash = window.location.hash.substring(1);
-            if(hash) {
-                encryptedPayload = hash;
-                switchView('view-read');
-                if(hash.startsWith("none:")) {
-                    document.getElementById('unlock-area').classList.add('hidden');
-                    document.getElementById('receive-area').classList.remove('hidden');
-                }
-            }
+function showRead() { 
+    const hash = window.location.hash.substring(1);
+    if(hash) {
+        encryptedPayload = hash;
+        switchView('view-read');
+        
+        // Update placeholder for receiver
+        if(hash.startsWith("ghost:")) {
+            document.getElementById('read-key').placeholder = "Manual untwirl amount (e.g. -5)";
+            document.getElementById('read-key').type = "text";
         }
+
+        if(hash.startsWith("none:")) {
+            document.getElementById('unlock-area').classList.add('hidden');
+            document.getElementById('receive-area').classList.remove('hidden');
+        }
+    }
+}
 
         function togglePasteArea() {
             const area = document.getElementById('manual-input-area');
@@ -189,15 +196,35 @@
         }
 
         // Crypto
-        function ghostShift(text, key, decrypt = false) {
-            let shift = Array.from(key).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            if (decrypt) shift = -shift;
-            return text.split('').map(char => {
-                const code = char.charCodeAt(0);
-                if (code >= 32 && code <= 126) return String.fromCharCode(((code - 32 + shift) % 95 + 95) % 95 + 32);
-                return char;
-            }).join('');
+function ghostShift(text, key, decrypt = false) {
+    // Convert key to an integer. Default to 0 if invalid.
+    let shift = parseInt(key) || 0;
+    
+    // If decrypting, we move in the opposite direction
+    if (decrypt) shift = -shift;
+    
+    return text.split('').map(char => {
+        const code = char.charCodeAt(0);
+        // Only shift printable ASCII characters (32 to 126)
+        if (code >= 32 && code <= 126) {
+            return String.fromCharCode(((code - 32 + shift) % 95 + 95) % 95 + 32);
         }
+        return char;
+    }).join('');
+}
+
+        document.getElementById('create-type').addEventListener('change', function(e) {
+    const keyInput = document.getElementById('create-key');
+    const readKeyInput = document.getElementById('read-key'); // Also for the receiver side
+    
+    if (e.target.value === 'ghost') {
+        keyInput.placeholder = "How many twirls? (e.g. +5)";
+        keyInput.type = "text"; // Allow minus sign
+    } else {
+        keyInput.placeholder = "Passphrase...";
+        keyInput.type = "password";
+    }
+});
 
         async function cryptVault(text, password, decrypt = false) {
             const encoder = new TextEncoder();
@@ -239,7 +266,7 @@
             try {
                 const [type, data] = encryptedPayload.split(':');
                 const pkg = JSON.parse(decodeURIComponent(escape(atob(data))));
-                let decryptedText = (type === 'ghost') ? ghostShift(pkg.m, key, true) : await cryptVault(pkg.m, key, true);
+                let decryptedText = (type === 'ghost') ? ghostShift(pkg.m, key, false) : await cryptVault(pkg.m, key, true);
                 pkg.m = decryptedText;
                 encryptedPayload = `${type}:${btoa(unescape(encodeURIComponent(JSON.stringify(pkg))))}`;
                 document.getElementById('unlock-area').classList.add('hidden');
