@@ -10,6 +10,10 @@
 ~
 ~
 # [Link to try out](https://ephemeral-letters.pages.dev/)
+## or copy me! :)
+```
+https://ephemeral-letters.pages.dev
+```
 
 ---
 
