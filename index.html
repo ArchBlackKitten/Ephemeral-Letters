@@ -49,6 +49,18 @@
             box-shadow: 0 0 30px rgba(239, 68, 68, 0.6) !important;
         }
 
+
+        .error-glow {
+        border-color: #ef4444 !important;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4) !important;
+        }
+
+         .text-proton-red {
+         color: #ff4d4d;
+         text-shadow: 0 0 10px rgba(255, 77, 77, 0.3);
+        }
+
+        
         /* Manual Input Slide-down */
         #manual-input-area:not(.hidden) {
             animation: slideDown 0.3s ease-out forwards;
@@ -165,11 +177,13 @@
 
 function showRead() { 
     const hash = window.location.hash.substring(1);
-    if(hash) {
+    const appBox = document.getElementById('app');
+
+    // Case A: Valid structure detected
+    if(hash && hash.includes(':')) {
         encryptedPayload = hash;
         switchView('view-read');
         
-        // Update placeholder for receiver
         if(hash.startsWith("ghost:")) {
             document.getElementById('read-key').placeholder = "Manual untwirl amount (e.g. -5)";
             document.getElementById('read-key').type = "text";
@@ -179,6 +193,17 @@ function showRead() {
             document.getElementById('unlock-area').classList.add('hidden');
             document.getElementById('receive-area').classList.remove('hidden');
         }
+    } 
+    // Case B: There is a hash, but it's broken/invalid
+    else if (window.location.hash) {
+        appBox.innerHTML = `
+            <div class="text-center py-8">
+                <div class="text-5xl mb-4 text-red-500">🚫</div>
+                <h2 class="text-xl font-bold text-red-400">Invalid Correspondence</h2>
+                <p class="text-xs text-slate-500 mb-6">This link is corrupted or incorrectly formatted.</p>
+                <button onclick="resetApp()" class="px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition text-xs">Return Home</button>
+            </div>`;
+        appBox.classList.add('igniting-glow'); // Reusing your red glow class
     }
 }
 
@@ -195,16 +220,30 @@ function showRead() {
         }
 
         function handleManualLink() {
-            const input = document.getElementById('manual-url-input').value.trim();
-            if (!input) return;
-            if (input.includes('#')) window.location.hash = input.split('#')[1];
-            else if (input.includes(':')) window.location.hash = input;
-            
-            document.getElementById('manual-url-input').value = "";
-            document.getElementById('manual-input-area').classList.add('hidden');
-            document.getElementById('reveal-paste-btn').innerText = "+ Already have a link?";
-            showRead();
-        }
+    const inputField = document.getElementById('manual-url-input');
+    const input = inputField.value.trim();
+    
+    // VALIDATION: If it doesn't have a colon, it's not a valid message package
+    if (!input || !input.includes(':')) {
+        inputField.style.borderColor = "#ef4444"; // Temporary red border
+        inputField.value = "";
+        inputField.placeholder = "INVALID LINK FORMAT";
+        
+        setTimeout(() => {
+            inputField.style.borderColor = ""; 
+            inputField.placeholder = "Paste link here...";
+        }, 1500);
+        return;
+    }
+
+    if (input.includes('#')) window.location.hash = input.split('#')[1];
+    else if (input.includes(':')) window.location.hash = input;
+    
+    inputField.value = "";
+    document.getElementById('manual-input-area').classList.add('hidden');
+    document.getElementById('reveal-paste-btn').innerText = "+ Already have a link?";
+    showRead();
+}
 
         // Crypto
 function ghostShift(text, key, decrypt = false) {
