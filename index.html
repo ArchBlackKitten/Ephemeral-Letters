@@ -75,16 +75,15 @@
                 <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block text-center">Received a link?</label>
                 <div class="flex gap-2">
                     <input type="text" 
-                       id="manual-url-input" 
-                      placeholder="Paste link here..." 
-                       /* Added text-slate-200 and forced the violet color for the link itself */
-                       class="flex-1 p-2 bg-black/20 border border-[var(--proton-glass)] rounded-lg text-xs outline-none focus:border-[var(--proton-glow)] text-slate-200 placeholder:text-slate-600">
+                        id="manual-url-input"
+                        placeholder="Paste link here..." 
+                        class="flex-1 p-2 bg-black/20 border border-[var(--proton-glass)] rounded-lg text-xs outline-none focus:border-[var(--proton-glow)] text-slate-200 placeholder:text-slate-600">
         
-                <button onclick="handleManualLink()" class="px-4 py-2 bg-white/5 border-[var(--proton-glass)] rounded-lg text-xs hover:bg-violet-600/40 transition">
-                    Open
-                </button>
+                    <button onclick="handleManualLink()" class="px-4 py-2 bg-white/5 border-[var(--proton-glass)] rounded-lg text-xs hover:bg-violet-600/40 transition">
+                        Open
+                    </button>
+                </div>
             </div>
-        </div>
 
         <div id="view-create" class="hidden space-y-4">
             <textarea id="create-msg" placeholder="Type your secret message here..." class="w-full h-32 p-4 bg-black/20 border border-[var(--proton-glass)] rounded-xl focus:ring-2 focus:border-[var(--proton-glow)] outline-none text-sm"></textarea>
