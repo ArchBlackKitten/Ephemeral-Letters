@@ -3,7 +3,13 @@
 
 **Ephemeral Letters** is a privacy-focused tool designed to securely share messages that exist only until they are read. By leveraging a hybrid-security model, it ensures that your content remains private while strictly enforcing "one-time-use" rules through a global "burn" mechanism.
 
-[View the App Live](https://ephemeral-letters.pages.dev/)
+> **Disclaimer:**
+> This tool facilitates the delivery of private messages. Once a message is received, the recipient's actions and decisions regarding that information are beyond the control of this software. Use this tool at your own risk.
+
+~
+~
+~
+# [Link to try out](https://ephemeral-letters.pages.dev/)
 
 ---
 
