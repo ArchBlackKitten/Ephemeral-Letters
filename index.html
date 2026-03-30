@@ -6,280 +6,273 @@
     <title>Ephemeral-Letters</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-    :root {
-        /* YOUR FAVORITE PROTON COLORS */
-        --proton-bg: #0a0514;
-        --proton-glow: #a855f7;      /* The Electric Purple */
-        --proton-violet: #8b5cf6;    /* The Soft Violet */
-        --proton-glass: rgba(167, 139, 250, 0.15);
-        --proton-interactive: #6366f1; /* The Indigo blue-ish tint */
-    }
+        :root {
+            --proton-bg: #0a0514;
+            --proton-glow: #a855f7;
+            --proton-violet: #8b5cf6;
+            --proton-glass: rgba(167, 139, 250, 0.15);
+            --proton-interactive: #6366f1;
+        }
 
-    body { 
-        background: var(--proton-bg); 
-        background-image: radial-gradient(circle at center, #1a0b2e 0%, var(--proton-bg) 100%);
-        color: #f1f5f9; 
-        font-family: 'Inter', sans-serif; 
-    }
+        body { 
+            background: var(--proton-bg); 
+            background-image: radial-gradient(circle at center, #1a0b2e 0%, var(--proton-bg) 100%);
+            color: #f1f5f9; 
+            font-family: 'Inter', sans-serif; 
+        }
 
-    .glass { 
-        background: rgba(139, 92, 246, 0.03); 
-        backdrop-filter: blur(12px); 
-        border: 1px solid var(--proton-glass); 
-    }
+        .glass { 
+            background: rgba(139, 92, 246, 0.03); 
+            backdrop-filter: blur(12px); 
+            border: 1px solid var(--proton-glass); 
+            transition: border-color 0.4s ease, box-shadow 0.4s ease;
+        }
 
-    .gradient-text { 
-        background: linear-gradient(45deg, var(--proton-glow), var(--proton-interactive)); 
-        -webkit-background-clip: text; 
-        -webkit-text-fill-color: transparent; 
-        text-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
-    }
+        .gradient-text { 
+            background: linear-gradient(45deg, var(--proton-glow), var(--proton-interactive)); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
 
-    /* CUSTOM CLICKABLE CLASSES */
-    .btn-proton { 
-        background-color: var(--proton-violet); 
-        box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
-    }
-    .btn-proton:hover { 
-        background-color: var(--proton-glow); 
-        box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
-    }
-    /* Prevents the white background/black text when pasting a link */
-    input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
-    input:-webkit-autofill:focus {
-        -webkit-text-fill-color: #f1f5f9; /* Keeps your light text */
-        -webkit-box-shadow: 0 0 0px 1000px rgba(0,0,0,0.2) inset; /* Keeps it dark */
-        transition: background-color 5000s ease-in-out 0s;
-    }
-    
-    .hidden { display: none; }
-</style>
+        .btn-proton { 
+            background-color: var(--proton-violet); 
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
+        }
+        .btn-proton:hover { 
+            background-color: var(--proton-glow); 
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Burn Effects */
+        .igniting-glow {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.6) !important;
+        }
+
+        /* Manual Input Slide-down */
+        #manual-input-area:not(.hidden) {
+            animation: slideDown 0.3s ease-out forwards;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .hidden { display: none; }
+    </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
 
-    <div id="app" class="w-full max-w-md p-8 rounded-3xl glass shadow-2xl">
+    <div id="app" class="w-full max-w-md p-8 rounded-3xl glass shadow-2xl transition-all duration-500">
         <div class="text-center mb-8">
-            <!-- CHANGE 3: Title is now a link to reset -->
-            <h1 onclick="resetApp()" class="relative z-50 text-3xl font-bold gradient-text mb-2 cursor-pointer hover:opacity-80 transition active:scale-95">Ephemeral Letters</h1>
+            <h1 onclick="resetApp()" class="text-3xl font-bold gradient-text mb-2 cursor-pointer hover:opacity-80">Ephemeral Letters</h1>
             <p class="text-slate-400 text-sm">Secure, invisible, one-time messages.</p>
         </div>
 
+        <!-- SELECTION VIEW -->
         <div id="view-selection" class="space-y-4">
-            <button onclick="showCreate()" class="w-full p-4 btn-proton rounded-xl font-semibold transition">Create a Secret Letter</button>
-            <button onclick="showRead()" class="w-full p-4 btn-proton rounded-xl font-semibold transition">Read a Received Letter</button>
-            
-            <!-- CHANGE 2: Box to paste link -->
-            <!-- Received Link Section -->
-            <div class="pt-4 border-t border-[var(--proton-glass)]">
-                <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block text-center">Received a link?</label>
+            <button onclick="showCreate()" class="w-full p-4 btn-proton rounded-xl font-semibold transition">
+                Create a Secret Letter
+            </button>
+            <div class="text-center pt-2">
+                <button id="reveal-paste-btn" onclick="togglePasteArea()" class="text-[10px] text-slate-500 uppercase font-bold hover:text-[var(--proton-glow)] transition tracking-widest">
+                    + Already have a link?
+                </button>
+            </div>
+            <div id="manual-input-area" class="hidden pt-4 border-t border-[var(--proton-glass)]">
                 <div class="flex gap-2">
-                    <input type="text" 
-                        id="manual-url-input"
-                        placeholder="Paste link here..." 
-                        class="flex-1 p-2 bg-black/20 border border-[var(--proton-glass)] rounded-lg text-xs outline-none focus:border-[var(--proton-glow)] text-slate-200 placeholder:text-slate-600">
-        
-                    <button onclick="handleManualLink()" class="px-4 py-2 bg-white/5 border-[var(--proton-glass)] rounded-lg text-xs hover:bg-violet-600/40 transition">
-                        Open
-                    </button>
+                    <input type="text" id="manual-url-input" placeholder="Paste link here..." class="flex-1 p-2 bg-black/20 border border-[var(--proton-glass)] rounded-lg text-xs outline-none focus:border-[var(--proton-glow)] text-slate-200">
+                    <button onclick="handleManualLink()" class="px-4 py-2 bg-white/5 border border-[var(--proton-glass)] rounded-lg text-xs hover:bg-violet-600/40 transition">Open</button>
                 </div>
             </div>
-         </div>
+        </div>
         
+        <!-- CREATE VIEW -->
         <div id="view-create" class="hidden space-y-4">
-            <textarea id="create-msg" placeholder="Type your secret message here..." class="w-full h-32 p-4 bg-black/20 border border-[var(--proton-glass)] rounded-xl focus:ring-2 focus:border-[var(--proton-glow)] outline-none text-sm"></textarea>
+            <textarea id="create-msg" placeholder="Type your secret message..." class="w-full h-32 p-4 bg-black/20 border border-[var(--proton-glass)] rounded-xl outline-none text-sm"></textarea>
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Max Uses</label>
-                    <input type="number" id="create-max" value="1" min="1" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl mt-1 text-sm">
+                    <input type="number" id="create-max" value="1" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl mt-1 text-sm">
                 </div>
                 <div>
-                    <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Expires In (Hours)</label>
-                    <input type="number" id="create-expiry" value="24" min="1" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl mt-1 text-sm">
+                    <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Expires (Hrs)</label>
+                    <input type="number" id="create-expiry" value="24" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl mt-1 text-sm">
                 </div>
-                <div class="col-span-2">
-                    <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Passphrase (Opt)</label>
-                    <input type="password" id="create-key" placeholder="None" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl mt-1 text-sm">
+                <div class="col-span-2 space-y-4">
+                    <div>
+                        <label class="text-[10px] text-slate-500 uppercase font-bold px-1">Security Type</label>
+                        <select id="create-type" class="w-full p-3 bg-black/40 border border-[var(--proton-glass)] rounded-xl mt-1 text-sm">
+                            <option value="none">None (Plaintext)</option>
+                            <option value="vault">Vault (AES-GCM)</option>
+                            <option value="ghost">Ghost (Shift)</option>
+                        </select>
+                    </div>
+                    <input type="password" id="create-key" placeholder="Passphrase..." class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl text-sm">
                 </div>
             </div>
-            <button onclick="generateLink()" class="w-full p-4 bg-[var(--proton-glow)] hover:opacity-90 rounded-xl font-semibold transition">Generate Link</button>
-            <button onclick="switchView('view-selection')" class="w-full text-sm text-slate-500 hover:text-white transition">← Back</button>
+            <button onclick="generateLink()" class="w-full p-4 bg-[var(--proton-glow)] rounded-xl font-semibold transition">Generate Link</button>
+            <button onclick="switchView('view-selection')" class="w-full text-sm text-slate-500 mt-2">← Back</button>
         </div>
 
+        <!-- SHARE VIEW -->
         <div id="view-share" class="hidden space-y-4 text-center">
-              <!-- Changed text-sky-400 to text-[var(--proton-violet)] -->
             <div class="p-4 bg-black/20 rounded-xl border border-dashed border-[var(--proton-glass)] break-all text-[10px] text-[var(--proton-violet)] font-mono" id="final-link"></div>
-    
-            <button onclick="copyLink()" id="copy-link-btn" class="w-full p-4 bg-emerald-600/80 hover:bg-emerald-500 rounded-xl font-semibold transition">
-                Copy Link to Share
-            </button>
+            <button onclick="copyLink()" id="copy-link-btn" class="w-full p-4 bg-emerald-600/80 rounded-xl font-semibold transition">Copy Link</button>
+            <button onclick="resetApp()" class="w-full text-sm text-slate-500 mt-4">Create Another Letter</button>
         </div>
 
+        <!-- READ/UNLOCK VIEW -->
         <div id="view-read" class="hidden space-y-4">
             <div id="unlock-area" class="space-y-4">
                 <p class="text-center text-slate-300">This letter is locked.</p>
-                <input type="password" id="read-key" placeholder="Enter secret key" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl outline-none focus:border-[var(--proton-glow)]">
-                <button onclick="decryptMessage()" class="w-full p-4 btn-proton rounded-xl font-semibold transition">Unlock with Key</button>
+                <input type="password" id="read-key" placeholder="Enter secret key" class="w-full p-3 bg-black/20 border border-[var(--proton-glass)] rounded-xl outline-none">
+                <button onclick="decryptMessage()" class="w-full p-4 btn-proton rounded-xl font-semibold transition">Unlock</button>
+                <button onclick="resetApp()" class="w-full text-sm text-slate-500 mt-2">← Cancel</button>
             </div>
-            
             <div id="receive-area" class="hidden text-center space-y-6">
-                <p class="text-lg text-slate-200">Heres your secret letter, click the button below to receive it.</p>
-                <button id="burn-btn" onclick="burnAndCopy()" class="w-full py-8 bg-gradient-to-r from-red-500 to-orange-500 hover:scale-105 rounded-2xl font-bold text-xl shadow-lg transition transform">
-                    RECEIVE & BURN
-                </button>
-                <p id="use-status" class="text-xs text-red-400 uppercase tracking-widest">Global One-Time Copy</p>
+                <p class="text-lg text-slate-200">The message is ready.</p>
+                <button id="burn-btn" onclick="burnAndCopy()" class="w-full py-8 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl font-bold text-xl shadow-lg transition transform">RECEIVE & BURN</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Define variables first
         let encryptedPayload = "";
 
-        
-        // Place this at the top so it's globally available
         function resetApp() {
-            // Clear the URL hash (the secret data)
             window.history.replaceState(null, null, window.location.pathname);
-            // Force reload to the main selection screen
-            window.location.href = window.location.origin + window.location.pathname;
+            window.location.reload();
         }
 
-        // CHANGE 2: Handle manual input
-        function handleManualLink() {
-            const input = document.getElementById('manual-url-input').value.trim();
-            if (!input) return;
-
-            try {
-                // Find the part after the '#'
-                const url = new URL(input.startsWith('http') ? input : 'https://' + input);
-                const hash = url.hash.substring(1);
-        
-                if (hash) {
-                    window.location.hash = hash;
-                    showRead(); // This triggers the decryption view
-                } else {
-                    alert("This link doesn't contain a secret code.");
-                }
-            } catch (e) {
-                // Fallback for when they paste just the code, not the whole URL
-                if (input.includes(':')) {
-                    window.location.hash = input;
-                    showRead();
-                } else {
-                    alert("Invalid link or code.");
-                }
-            }
+        function switchView(id) {
+            ['view-selection', 'view-create', 'view-share', 'view-read'].forEach(v => document.getElementById(v).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
         }
 
         function showCreate() { switchView('view-create'); }
-        
+
         function showRead() { 
             const hash = window.location.hash.substring(1);
             if(hash) {
                 encryptedPayload = hash;
                 switchView('view-read');
-                if(hash.startsWith("plain:")) {
+                if(hash.startsWith("none:")) {
                     document.getElementById('unlock-area').classList.add('hidden');
                     document.getElementById('receive-area').classList.remove('hidden');
                 }
-            } else {
-                switchView('view-selection');
             }
         }
 
-        function switchView(id) {
-            ['view-selection', 'view-create', 'view-share', 'view-read'].forEach(v => {
-                document.getElementById(v).classList.add('hidden');
-            });
-            document.getElementById(id).classList.remove('hidden');
+        function togglePasteArea() {
+            const area = document.getElementById('manual-input-area');
+            const btn = document.getElementById('reveal-paste-btn');
+            if (area.classList.contains('hidden')) {
+                area.classList.remove('hidden');
+                btn.innerText = "- Close Paste Area";
+            } else {
+                area.classList.add('hidden');
+                btn.innerText = "+ Already have a link?";
+            }
         }
 
-       
+        function handleManualLink() {
+            const input = document.getElementById('manual-url-input').value.trim();
+            if (!input) return;
+            if (input.includes('#')) window.location.hash = input.split('#')[1];
+            else if (input.includes(':')) window.location.hash = input;
+            
+            document.getElementById('manual-url-input').value = "";
+            document.getElementById('manual-input-area').classList.add('hidden');
+            document.getElementById('reveal-paste-btn').innerText = "+ Already have a link?";
+            showRead();
+        }
+
+        // Crypto
+        function ghostShift(text, key, decrypt = false) {
+            let shift = Array.from(key).reduce((acc, char) => acc + char.charCodeAt(0), 0);
+            if (decrypt) shift = -shift;
+            return text.split('').map(char => {
+                const code = char.charCodeAt(0);
+                if (code >= 32 && code <= 126) return String.fromCharCode(((code - 32 + shift) % 95 + 95) % 95 + 32);
+                return char;
+            }).join('');
+        }
+
+        async function cryptVault(text, password, decrypt = false) {
+            const encoder = new TextEncoder();
+            if (!decrypt) {
+                const salt = window.crypto.getRandomValues(new Uint8Array(16));
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                const baseKey = await window.crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]);
+                const key = await window.crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" }, baseKey, { name: "AES-GCM", length: 256 }, false, ["encrypt"]);
+                const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoder.encode(text));
+                const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength);
+                combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(encrypted), salt.length + iv.length);
+                return btoa(String.fromCharCode(...combined));
+            } else {
+                const combined = new Uint8Array(atob(text).split("").map(c => c.charCodeAt(0)));
+                const salt = combined.slice(0, 16); const iv = combined.slice(16, 28); const data = combined.slice(28);
+                const baseKey = await window.crypto.subtle.importKey("raw", encoder.encode(password), "PBKDF2", false, ["deriveKey"]);
+                const key = await window.crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: 100000, hash: "SHA-256" }, baseKey, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+                const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, data);
+                return new TextDecoder().decode(decrypted);
+            }
+        }
+
         async function generateLink() {
             const msg = document.getElementById('create-msg').value;
+            const type = document.getElementById('create-type').value;
             const key = document.getElementById('create-key').value;
-            const max = document.getElementById('create-max').value || 1;
-            let expiry = parseInt(document.getElementById('create-expiry').value) || 24;
-
-            // HARD CAP: Force 24 hours if the user enters more
-            if (expiry > 24) expiry = 24;
-            if (expiry < 1) expiry = 1;
-            
-            if(!msg) return alert("Write something first!");
-
-            // Create a package object
-            const pkg = { m: msg, c: parseInt(max), e: expiry, id: Math.random().toString(36).substring(2, 11) };
-            const str = JSON.stringify(pkg);
-            const encoded = btoa(unescape(encodeURIComponent(str)));
-
-            encryptedPayload = (key ? "enc:" : "plain:") + encoded;
-            const url = window.location.origin + window.location.pathname + "#" + encryptedPayload;
-            document.getElementById('final-link').innerText = url;
+            if(!msg || (type !== 'none' && !key)) return alert("Missing information.");
+            let finalMsg = msg;
+            if (type === 'ghost') finalMsg = ghostShift(msg, key);
+            if (type === 'vault') finalMsg = await cryptVault(msg, key);
+            const pkg = { m: finalMsg, c: parseInt(document.getElementById('create-max').value), e: parseInt(document.getElementById('create-expiry').value), id: Math.random().toString(36).substring(2, 11) };
+            encryptedPayload = `${type}:${btoa(unescape(encodeURIComponent(JSON.stringify(pkg))))}`;
+            document.getElementById('final-link').innerText = window.location.origin + window.location.pathname + "#" + encryptedPayload;
             switchView('view-share');
+        }
+
+        async function decryptMessage() {
+            const key = document.getElementById('read-key').value;
+            try {
+                const [type, data] = encryptedPayload.split(':');
+                const pkg = JSON.parse(decodeURIComponent(escape(atob(data))));
+                let decryptedText = (type === 'ghost') ? ghostShift(pkg.m, key, true) : await cryptVault(pkg.m, key, true);
+                pkg.m = decryptedText;
+                encryptedPayload = `${type}:${btoa(unescape(encodeURIComponent(JSON.stringify(pkg))))}`;
+                document.getElementById('unlock-area').classList.add('hidden');
+                document.getElementById('receive-area').classList.remove('hidden');
+            } catch (e) { alert("Invalid key."); }
+        }
+
+        function burnAndCopy() {
+            const appBox = document.getElementById('app');
+            const [type, data] = encryptedPayload.split(':');
+            const pkg = JSON.parse(decodeURIComponent(escape(atob(data))));
+
+            navigator.clipboard.writeText(pkg.m);
+            appBox.classList.add('igniting-glow');
+            setTimeout(() => {
+                appBox.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-5xl mb-4">🔥</div>
+                        <h2 class="text-xl font-bold text-red-400">Message Destroyed</h2>
+                        <p class="text-xs text-slate-500 mb-6">Copied to clipboard successfully.</p>
+                        <button onclick="resetApp()" class="px-6 py-2 bg-white/10 rounded-lg hover:bg-white/20 transition">Start Over</button>
+                    </div>`;
+                appBox.classList.remove('igniting-glow');
+            }, 600);
         }
 
         function copyLink() {
             navigator.clipboard.writeText(document.getElementById('final-link').innerText);
             document.getElementById('copy-link-btn').innerText = "Copied!";
-            setTimeout(() => { document.getElementById('copy-link-btn').innerText = "Copy Link to Share"; }, 2000);
         }
 
-        function decryptMessage() {
-            // In this simple demo, we just reveal the burn button
-            document.getElementById('unlock-area').classList.add('hidden');
-            document.getElementById('receive-area').classList.remove('hidden');
-        }
-
-        async function burnAndCopy() {
-            const btn = document.getElementById('burn-btn');
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            const data = encryptedPayload.replace("plain:", "").replace("enc:", "");
-            const pkg = JSON.parse(decodeURIComponent(escape(atob(data))));
-            
-            try {
-                // CHANGE 1: Talking to the right Function for counting
-                const response = await fetch('/access-message', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        messageId: pkg.id, 
-                        maxCopies: pkg.c, 
-                        expiryHours: pkg.e
-                    })
-                });
-
-                if (response.status === 403) {
-                    alert("This letter has already reached its copy limit and was destroyed.");
-                    resetApp();
-                    return;
-                }
-
-                const result = await response.json();
-
-                navigator.clipboard.writeText(pkg.m).then(() => {
-                    document.getElementById('app').innerHTML = `
-                        <div class="text-center space-y-4 py-8">
-                            <div class="text-5xl">🔥</div>
-                            <h2 class="text-xl font-bold text-red-400">Message Destroyed</h2>
-                            <p class="text-slate-400">Copy ${result.count} of ${pkg.c} complete. Content copied to clipboard.</p>
-                            <button onclick="resetApp()" class="text-[var(--proton-glow)] underline mt-4">Create new letter</button>
-                        </div>
-                    `;
-                    window.history.replaceState(null, null, window.location.pathname);
-                });
-            } catch (e) {
-                alert("Error connecting to security server.");
-                btn.disabled = false;
-                btn.innerText = "RECEIVE & BURN";
-            }
-        }
-
-        window.onload = () => { if(window.location.hash) showRead(); };
+        window.onhashchange = showRead;
+        window.onload = showRead;
     </script>
 </body>
 </html>
