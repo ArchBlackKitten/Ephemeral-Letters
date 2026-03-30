@@ -1,49 +1,51 @@
-# Ephemeral Letters | Zero-Knowledge, Single-Use Correspondence
-**Securely share messages that exist only until they are read.**
+# 🔥 Ephemeral Letters
+### Zero-Knowledge, Single-Use Correspondence
 
-A visual hiding tool: Just share the link and your recipient has a one-time-use message in their clipboard.
+**Ephemeral Letters** is a privacy-focused tool designed to securely share messages that exist only until they are read. By leveraging a hybrid-security model, it ensures that your content remains private while strictly enforcing "one-time-use" rules.
 
-#
-## 🛡️ How Ephemera Works
-Ephemera uses a Hybrid-Security model. The secret message never touches a database, but the "one-time-use" rule is strictly enforced by a global counter.
+```bash
+https://ephemeral-letters.pages.dev/
+```
 
-### 📤 Phase 1: Creation (Person A)
-**✍️ Compose:** Person A writes a message and sets a Max Copy limit (e.g., 3 uses).
+---
 
-**🔐 Encrypt:** The app packages the message and the rules into a JSON object. This is converted into a Base64 string.
+## 🛡️ How It Works
+The app uses a **Hybrid-Security Model**. While the secret message itself is never stored in a database, the "burn" rules are enforced globally to prevent link reuse.
 
-**🔗 Link Generation:** The secret string is appended to the URL as a "Fragment" (the part after the #).
+### 📤 Phase 1: Creation (Sender)
+1.  **Compose:** The sender writes a message and sets a **Max Copy** limit (e.g., 1 or 3 uses).
+2.  **Encrypt:** The app packages the message and metadata into a JSON object, then converts it into a Base64-encoded string.
+3.  **Link Generation:** This secret string is appended to the URL as a **Fragment** (the part after the `#`).
 
-**Note: Fragments are never sent to the server by browsers, keeping the message content 100% private to the link-holders.**
+> **Note:** URL Fragments are handled exclusively by the browser and are **never** sent to the server. This ensures the message content remains 100% private to the link-holders.
 
+---
 
-## 📩 Phase 2: Delivery & Verification (Person B)
-**📥 Receipt:** Person B opens the link or pastes it into the app.
+### 📩 Phase 2: Delivery & Verification (Recipient)
+1.  **Receipt:** The recipient opens the link or pastes the payload into the app.
+2.  **Identity Check:** The app extracts a unique `MessageID` from the URL fragment.
+3.  **Global Sync:** The app pings a **Cloudshare Function**, which checks an **Upstash Redis** database to verify if the `MessageID` has reached its copy limit.
+4.  **Unlock:** If the limit is intact, the UI reveals the "Receive & Burn" button.
 
-**🕵️ Identity Check:** The app extracts a unique MessageID from the URL.
+---
 
-**📡 Global Sync:** The app pings a Netlify Function, which checks an Upstash Redis database to see if the MessageID has reached its copy limit.
+### ⚡ Phase 3: The Burn (Self-Destruct)
+1.  **Counter Increment:** When the recipient clicks "Receive," the Cloudshare Function increments the counter in the Redis database.
+2.  **Decryption:** The message is decrypted locally in the recipient's browser.
+3.  **Clipboard & Wipe:** The text is copied to the clipboard, and the app immediately clears the URL and the screen.
+4.  **Global Expiry:** Once the database counter hits the **Max Copy** limit, the `MessageID` is "Burned." Any future attempts to access that link will return a "Message Destroyed" error.
 
-**🔓 Unlock:** If the limit hasn't been reached, the UI reveals the "Receive & Burn" button.
+---
 
+## 🛠️ Technical Stack
 
-## ⚡ Phase 3: The Burn (The "Self-Destruct")
-**Copy + 1:** When Person B clicks "Receive," the Netlify Function increments the counter in the database.
+| Component | Technology | Role |
+| :--- | :--- | :--- |
+| **Frontend** | HTML5 / Tailwind CSS | Single-file, zero-dependency UI. |
+| **Serverless** | Cloudshare Functions | Handles logic for checking/incrementing use counts. |
+| **Database** | Upstash Redis | Serverless Key-Value store for global "burn" tracking. |
+| **Architecture** | Zero-Knowledge | Uses URL Fragments to keep data out of server logs. |
 
-**📋 Clipboard:** The message is decrypted locally in the browser and copied to the clipboard.
+---
 
-**🔥 Local Wipe:** The app immediately clears the URL and the screen.
-
-**🚫 Global Expiry: Once the database counter hits the Max Copy limit, the MessageID is "Burned." Any future attempts to open that specific link will result in a "Message Destroyed" error.**
-
-
-
-#
-# 🛠️ Technical Stack
-**Frontend:** HTML5, Tailwind CSS (Single-file utility).
-
-**Backend:** Netlify Functions (Serverless logic).
-
-**Database:** Upstash Redis (Serverless KV store for global counting).
-
-**Security:** Fragment-based data storage (Zero-knowledge architecture).
+*“Security is not a product, but a process.”*
