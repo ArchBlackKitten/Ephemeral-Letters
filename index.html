@@ -240,9 +240,12 @@
             const pkg = JSON.parse(decodeURIComponent(escape(atob(data))));
             
             try {
-                // CHANGE 1: Talking to the Netlify Function for counting
-                const response = await fetch('/.netlify/functions/access-message', {
+                // CHANGE 1: Talking to the right Function for counting
+                const response = await fetch('/access-message', {
                     method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify({ 
                         messageId: pkg.id, 
                         maxCopies: pkg.c, 
